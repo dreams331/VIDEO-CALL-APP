@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Box, CssBaseline, Avatar, Paper, Link, Grid } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import { auth } from './firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const theme = createTheme({
   palette: {
@@ -15,32 +18,32 @@ const theme = createTheme({
 });
 
 const Signup = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!username || !password || !confirmPassword) {
-      setError('All fields are required');
-      return;
-    }
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
-    // Placeholder for actual signup logic
-    console.log('Account created', { username, password });
-    setError('');
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      setError('');
+      navigate('/');
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container component="main" maxWidth="xs">
-      <Paper elevation={6} style={{ padding: '2rem', marginTop: '5rem', borderRadius: '15px' }}>
+        <Paper elevation={3} style={{ padding: '2rem', marginTop: '5rem', borderRadius: '15px' }}>
           <Box display="flex" flexDirection="column" alignItems="center">
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
@@ -53,13 +56,13 @@ const Signup = () => {
                 margin="normal"
                 required
                 fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                autoComplete="username"
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
                 autoFocus
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 error={!!error}
               />
               <TextField

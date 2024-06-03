@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Box, CssBaseline, Avatar, Paper, Link, Grid } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import { auth } from './firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const theme = createTheme({
   palette: {
@@ -15,25 +18,19 @@ const theme = createTheme({
 });
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Example error handling logic
-    if (!username || !password) {
-      setError('Username and password are required');
-      return;
-    }
-
-    // Placeholder for actual authentication logic
-    if (username === 'test' && password === 'password') {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       setError('');
-      console.log('Login successful');
-      // Redirect or perform other actions on successful login
-    } else {
-      setError('Invalid username or password');
+      navigate('/');
+    } catch (error) {
+      setError(error.message);
     }
   };
 
@@ -41,7 +38,7 @@ const Login = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container component="main" maxWidth="xs">
-      <Paper elevation={6} style={{ padding: '2rem', marginTop: '5rem', borderRadius: '15px' }}>
+        <Paper elevation={3} style={{ padding: '2rem', marginTop: '5rem', borderRadius: '15px' }}>
           <Box display="flex" flexDirection="column" alignItems="center">
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
@@ -54,13 +51,13 @@ const Login = () => {
                 margin="normal"
                 required
                 fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                autoComplete="username"
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
                 autoFocus
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 error={!!error}
               />
               <TextField
@@ -90,14 +87,9 @@ const Login = () => {
               >
                 Sign In
               </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
+              <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link href="#" variant="body2">
+                  <Link href="/signup" variant="body2">
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
