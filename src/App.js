@@ -1,36 +1,31 @@
-// src/App.js
-import React, { useEffect, useState } from 'react';
-import { auth } from './firebase';
-import VideoCall from './VideoCall';
-import PaymentForm from './PaymentForm';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './Login';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+});
 
 function App() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   return (
-    <div className="App">
-      {user ? (
-        <>
-          <VideoCall />
-          <PaymentForm />
-        </>
-      ) : (
-        <Login />
-      )}
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          {/* Add other routes here */}
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
